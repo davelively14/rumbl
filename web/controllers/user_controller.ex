@@ -3,6 +3,6 @@ defmodule Rumbl.UserController do
 
   def index(conn, _params) do
     users = Repo.all(Rumbl.User)
-    render conn, "index.htmAdl", users: users
+    render conn, "index.html", users: users
   end
 end
