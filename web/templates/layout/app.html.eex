@@ -18,7 +18,6 @@
           <ul class="nav nav-pills pull-right">
             <li><%= link "Home", to: page_path(@conn, :index) %></li>
           </ul>
-
         </nav>
         <span class="logo"></span>
       </header>
