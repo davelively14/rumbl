@@ -13,6 +13,7 @@ defmodule Rumbl.User do
   def changeset(model, params \\ :empty) do
     model
     # Using ~w(name username) is the same as typing ["name", "username"]
+    # The 4th parameter is a tuple for optional fields.
     |> cast(params, ~w(name username), [])
     |> validate_length(:username, min: 1, max: 20)
   end
