@@ -17,7 +17,26 @@ defmodule Rumbl.User do
     # The 4th parameter is a tuple for optional fields
     # Returns an Ecto.Changeset, with all required and optional values assigned to
     # schema types
+    #
+    # Nothing is commited to the database until the Repo.insert(changeset) is called
     |> cast(params, ~w(name username), [])
     |> validate_length(:username, min: 1, max: 20)
+  end
+
+  def registration_changeset(model, params) do
+    model
+    |> changeset(params)
+    |> cast(params, ~w(password), [])
+    |> validate_length(:password, min: 6, max: 100)
+    |> put_pass_hash()
+  end
+
+  defp put_pass_hash(changeset) do
+    case changeset do
+      %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
+        put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(pass))
+      _ ->
+        changeset
+    end
   end
 end
