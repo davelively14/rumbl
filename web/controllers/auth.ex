@@ -1,5 +1,6 @@
 defmodule Rumbl.Auth do
   import Plug.Conn
+  import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
   # Extracts the repository, raising error if given key doesn't exist.
   # Rumbl.Auth will always require the :repo option
@@ -30,5 +31,32 @@ defmodule Rumbl.Auth do
     # cookie back to the client with a different identifier, in case an attacker knew
     # the previous one.
     |> configure_session(renew: true)
+  end
+
+  def login_by_username_and_pass(conn, username, given_pass, opts) do
+    repo = Keyword.fetch!(opts, :repo)
+    user = repo.get_by(Rumbl.User, username: username)
+
+    # Match against different conditions to find first one that evaluates to true
+    cond do
+
+        # if user exists, then it will call Comeonin's checkpw function. If it returns
+        # good, it will run the login function for that user and return the conn, then
+        # return the conn
+        user && checkpw(given_pass, user.password_hash) ->
+          {:ok, login(conn, user)}
+
+        # If user, then it means the password was all that failed from above.  This will
+        # return the conn with an error :unauthorized.
+        user ->
+          {:error, :unauthorized, conn}
+
+        # If all above fails, then it runs a dummy function to simulate password check
+        # with variable timing. This hardens the authentication layer against timing
+        # attacks.
+        true ->
+          dummy_checkpw()
+          {:error, :not_found, conn}
+    end
   end
 end
