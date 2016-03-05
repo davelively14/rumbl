@@ -14,9 +14,17 @@
 <body>
 <div class="container" role="main">
   <div class="header">
-    <ul class="nav nav-pills pull-right">
-      <li><%= link "All Users", to: user_path(@conn, :index) %></li>
-    </ul>
+    <ol class="breadcrumb text-right">
+      <%= if @current_user do %>
+        <li><%= @current_user.username %></li>
+        <li>
+          <%= link "Logout", to: session_path(@conn, :delete, @current_user), method: "delete" %>
+        </li>
+      <% else %>
+        <li><%= link "Register", to: user_path(@conn, :new) %></li>
+        <li><%= link "Login", to: session_path(@conn, :new) %></li>
+      <% end %>
+    </ol>
     <span class="logo"></span>
   </div>
 
