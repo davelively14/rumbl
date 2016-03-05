@@ -59,4 +59,10 @@ defmodule Rumbl.Auth do
           {:error, :not_found, conn}
     end
   end
+
+  def logout(conn) do
+    # Drops the entire session. Could have used delete_session(conn, :user_id) to keep
+    # everything else besides the :user_id.
+    configure_session(conn, drop: true)
+  end
 end
