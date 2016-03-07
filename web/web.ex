@@ -36,6 +36,9 @@ defmodule Rumbl.Web do
 
       import Rumbl.Router.Helpers
       import Rumbl.Gettext
+
+      # Added our own plug to all controllers
+      import Rumbl.Auth, only: [authenticate_user: 2]
     end
   end
 
@@ -58,6 +61,9 @@ defmodule Rumbl.Web do
   def router do
     quote do
       use Phoenix.Router
+
+      # Added our own plug to all routers
+      import Rumbl.Auth, only: [authenticate_user: 2]
     end
   end
 
