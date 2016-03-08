@@ -11,7 +11,14 @@ defmodule Rumbl.VideoController do
   end
 
   def new(conn, _params) do
-    changeset = Video.changeset(%Video{})
+
+    # We need to point user_id to the id of the user current stored in teh connection at
+    # conn.assigns.current_user. The build_assoc function form Ecto will do that.
+    changeset =
+      conn.assigns.current_user
+      |> build_assoc(:videos)
+      |> Video.changeset()
+
     render(conn, "new.html", changeset: changeset)
   end
 
