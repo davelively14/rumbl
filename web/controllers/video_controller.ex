@@ -12,7 +12,7 @@ defmodule Rumbl.VideoController do
 
   def new(conn, _params) do
 
-    # We need to point user_id to the id of the user current stored in teh connection at
+    # We need to point user_id to the id of the user current stored in the connection at
     # conn.assigns.current_user. The build_assoc function form Ecto will do that.
     changeset =
       conn.assigns.current_user
@@ -75,7 +75,5 @@ defmodule Rumbl.VideoController do
   # Every controller has its own default action function, which is a plug that dispatches
   # to the proper action at the end of the controller pipeline. This will replace that default
   # action function.
-  def action(conn, _) do
-    apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
-  end
+
 end
