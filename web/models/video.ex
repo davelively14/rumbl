@@ -23,5 +23,11 @@ defmodule Rumbl.Video do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+
+    # Because we established an association in the migration when creating the table, any
+    # attempt to pick an invalid category resulting in an operation fail will create a constraint
+    # error. This function allows us to catch the constraint error in the changeset, which
+    # contains error information fit for human consumption.
+    |> assoc_constraint(:category)
   end
 end
