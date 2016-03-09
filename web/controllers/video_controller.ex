@@ -22,6 +22,7 @@ defmodule Rumbl.VideoController do
     render(conn, "new.html", changeset: changeset)
   end
 
+
   def create(conn, %{"video" => video_params}) do
     changeset = Video.changeset(%Video{}, video_params)
 
@@ -70,5 +71,12 @@ defmodule Rumbl.VideoController do
     conn
     |> put_flash(:info, "Video deleted successfully.")
     |> redirect(to: video_path(conn, :index))
+  end
+
+  # Every controller has its own default action function, which is a plug that dispatches
+  # to the proper action at the end of the controller pipeline. This will replace that default
+  # action function.
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
   end
 end
