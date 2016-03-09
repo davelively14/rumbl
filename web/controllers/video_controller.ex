@@ -1,9 +1,10 @@
 defmodule Rumbl.VideoController do
   use Rumbl.Web, :controller
-
   alias Rumbl.Video
+  alias Rumbl.Category
 
   plug :scrub_params, "video" when action in [:create, :update]
+  plug :load_categories when action in [:new, :create, :edit, :update]
 
   # Every controller has its own default action function, which is a plug that dispatches
   # to the proper action at the end of the controller pipeline. This will replace that default
@@ -88,5 +89,17 @@ defmodule Rumbl.VideoController do
   # Only returns videos associated with the particular user.
   defp user_videos(user) do
     assoc(user, :videos)
+  end
+
+  # Functional plug that builds a query, then passes that query to the repo in order
+  # to retrive the categories. Using assign(conn, :categories, categories), this plug will
+  # make those categories available as @categories.
+  defp load_categories(conn, _) do
+    query =
+      Category
+      |> Category.alphabetical
+      |> Category.names_and_ids
+    categories = Repo.all query
+    assign(conn, :categories, categories)
   end
 end
