@@ -7,7 +7,8 @@ defmodule Rumbl.VideoController do
 
   # Every controller has its own default action function, which is a plug that dispatches
   # to the proper action at the end of the controller pipeline. This will replace that default
-  # action function.
+  # action function and pass a third variable to every function: conn.assigns.current_user.
+  # Every function had to be changed to accept this new variable.
   def action(conn, _) do
     apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
   end
