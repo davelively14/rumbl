@@ -22,6 +22,12 @@ defmodule Rumbl.User do
     # Nothing is commited to the database until the Repo.insert(changeset) is called
     |> cast(params, ~w(name username), [])
     |> validate_length(:username, min: 1, max: 20)
+
+    # Because we put 'create unique_index(:users, [:username])' in the migration when
+    # creating the table, any attempt to create a duplicate entry will create a constraint
+    # error. This function allows us to catch the constraint error in the changeset, which
+    # contains error information fit for human consumption.
+    |> unique_constraint(:username)
   end
 
   def registration_changeset(model, params) do
