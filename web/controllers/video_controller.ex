@@ -22,7 +22,6 @@ defmodule Rumbl.VideoController do
     render(conn, "new.html", changeset: changeset)
   end
 
-
   def create(conn, %{"video" => video_params}) do
     changeset = Video.changeset(%Video{}, video_params)
 
