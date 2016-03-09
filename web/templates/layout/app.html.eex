@@ -20,6 +20,9 @@
         <li>
           <%= link "Logout", to: session_path(@conn, :delete, @current_user), method: "delete" %>
         </li>
+        <li>
+          <%= link "Home", to: page_path(@conn, :index) %>
+        </li>
       <% else %>
         <li><%= link "Register", to: user_path(@conn, :new) %></li>
         <li><%= link "Login", to: session_path(@conn, :new) %></li>
