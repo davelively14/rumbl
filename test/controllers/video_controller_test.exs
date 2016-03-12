@@ -13,6 +13,7 @@ defmodule Rumbl.VideoControllerTest do
     ], fn conn ->
       assert html_response(conn, 302)
       assert conn.halted
+
     end)
   end
 end
