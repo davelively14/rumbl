@@ -14,16 +14,28 @@ defmodule Rumbl.Auth do
     Keyword.fetch!(opts, :repo)
   end
 
+  # Controversial change. We made our code more testable, but added complexity.
   def call(conn, repo) do
     # If a session :user_id exists, it will be assigned to user_id, otherwise nil
     user_id = get_session(conn, :user_id)
 
-    # If user_id is false, it won't go execute repo.get. Same as:
-    #   if user_id, do: repo.get(Rumbl.User, user_id)
-    user = user_id && repo.get(Rumbl.User, user_id)
+    # First condition to evaluate true is the only one that runs
+    cond do
+      # If we already have a current_user, we return the connection as is
+      user = conn.assigns[:current_user] ->
+        conn
 
-    # Stores the user (or nil, if no existing session) in the :current_user
-    assign(conn, :current_user, user)
+      # If user_id is false, it won't go execute repo.get. Same as:
+      #   if user_id, do: repo.get(Rumbl.User, user_id)
+      user = user_id && repo.get(Rumbl.User, user_id) ->
+        # Stores the user in the :current_user
+        assign(conn, :current_user, user)
+
+      # If no user is logged in, will assign nil
+      true ->
+        assign(conn, :current_user, nil)
+    end
+
   end
 
   def login(conn, user) do
