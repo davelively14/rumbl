@@ -33,4 +33,14 @@ defmodule Rumbl.AuthTest do
       |> Auth.authenticate_user([])
       refute conn.halted
   end
+
+  test "login puts the user in the session", %{conn: conn} do
+    login_conn =
+      conn
+      |> Auth.login(%Rumbl.User{id: 123})
+      |> send_resp(:ok, "")
+
+    next_conn = get(login_conn, "/")
+    assert get_session(next_conn, :user_id) == 123
+  end
 end
