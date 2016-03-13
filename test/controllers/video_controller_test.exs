@@ -6,7 +6,11 @@ defmodule Rumbl.VideoControllerTest do
   @invalid_attrs %{title: "invalid"}
 
   setup %{conn: conn} = config do
-    if username = config[:login_as] do
+
+    # The book said to make this 'if username = config[:login_as] do'
+    # but that's unnecessary and confusing. We're just testing if the connection
+    # has a :login_as tag stored or not.
+    if config[:login_as] do
       user = insert_user(username: "max")
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
