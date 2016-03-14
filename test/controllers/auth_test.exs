@@ -40,7 +40,10 @@ defmodule Rumbl.AuthTest do
       |> Auth.login(%Rumbl.User{id: 123})
       |> send_resp(:ok, "")
 
+    # Make a request with the user_id information in the session.
     next_conn = get(login_conn, "/")
+
+    # Ensures that our user is still logged in after the request.
     assert get_session(next_conn, :user_id) == 123
   end
 
@@ -48,10 +51,16 @@ defmodule Rumbl.AuthTest do
     logout_conn =
       conn
       |> put_session(:user_id, 123)
+
+      # This should delete the :user_id in the session
       |> Auth.logout()
       |> send_resp(:ok, "")
 
+    # Makes request, which should add a :user_id to the session, then drop it
+    # once Auth.logout() is called.
     next_conn = get(logout_conn, "/")
+
+    # Asserts that the :user_id is no longer in the session.
     refute get_session(next_conn, :user_id)
   end
 end
