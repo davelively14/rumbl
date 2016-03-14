@@ -1,6 +1,7 @@
 defmodule Rumbl.SessionController do
   use Rumbl.Web, :controller
 
+  # test
   def new(conn, _) do
     render conn, "new.html"
   end
