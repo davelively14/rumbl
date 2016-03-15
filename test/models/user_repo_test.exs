@@ -7,8 +7,12 @@ defmodule Rumbl.UserRepoTest do
   @valid_attrs %{name: "A User", username: "eva"}
 
   test "converts unique_constraint on username to error" do
+    # Add user with a username of "eric" to the repo
     Rumbl.TestHelpers.insert_user(username: "eric")
     attrs = Map.put(@valid_attrs, :username, "eric")
+
+    # Attempt to add another user with the same username as we added in the
+    # Rumbl.TestHelpers.insert_user function above. Should throw an error.
     changeset = User.changeset(%User{}, attrs)
 
     assert {:error, changeset} = Repo.insert(changeset)
