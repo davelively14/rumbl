@@ -8,5 +8,5 @@
 </div>
 <div class="container">
   <h3>Videos</h3>
-  <%= link "Go to videos", to: video_path(@conn, :index) %>
+  <%= link "My videos", to: video_path(@conn, :index) %>
 </div>
