@@ -5,6 +5,7 @@ defmodule Rumbl.Video do
     field :url, :string
     field :title, :string
     field :description, :string
+    field :slug, :string
     belongs_to :user, Rumbl.User
     belongs_to :category, Rumbl.Category
 
@@ -23,11 +24,27 @@ defmodule Rumbl.Video do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> slugify_title()
 
     # Because we established an association in the migration when creating the table, any
     # attempt to pick an invalid category resulting in an operation fail will create a constraint
     # error. This function allows us to catch the constraint error in the changeset, which
     # contains error information fit for human consumption.
     |> assoc_constraint(:category)
+  end
+
+  defp slugify_title(changeset) do
+    if title = get_change(changeset, :title) do
+      put_change(changeset, :slug, slugify(title))
+    else
+      changeset
+    end
+  end
+
+  # Downcases the string and replaces nonword characers with a "-" character
+  defp slugify(str) do
+    str
+    |> String.downcase
+    |> String.replace(~r/[^\w-]+/, "-")
   end
 end
