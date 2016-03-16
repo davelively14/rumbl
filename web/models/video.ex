@@ -1,6 +1,12 @@
 defmodule Rumbl.Video do
   use Rumbl.Web, :model
 
+  # The primary key is still called :id, but it's of type Permalink now.
+  # When any value is matched to the :id, it will go through Permalink's
+  # casts, which will use Integer.parse to pull the first integer. As a result,
+  # that will align with the underlying Ecto id, even though route calls will
+  # pass id and slug.
+  @primary_key {:id, Rumbl.Permalink, autogenerate: true}
   schema "videos" do
     field :url, :string
     field :title, :string
