@@ -47,4 +47,14 @@ defmodule Rumbl.Video do
     |> String.downcase
     |> String.replace(~r/[^\w-]+/, "-")
   end
+
+  # Phoenix.Param is an Elixir protocol that, by default, extracts the id from
+  # the struct. It is used to pass the id parameter by default when routing.
+  # This function redefines the protocol for the Video data type, thus passing
+  # the id-slug of every video as the path.
+  defimpl Phoenix.Param, for: Rumbl.Video do
+    def to_param(%{slug: slug, id: id}) do
+      "#{id}-#{slug}"
+    end
+  end
 end
