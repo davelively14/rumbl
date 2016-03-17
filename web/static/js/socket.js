@@ -5,7 +5,7 @@ import {Socket} from "phoenix"
 // optiona, but will include helpful debugging in the JS console.
 let socket = new Socket("/socket", {
   params: {token: window.userToken},
-  logger: (kind, msg, data) => { console.log('${kind}: ${msg}', data) }
+  logger: (kind, msg, data) => { console.log(`${kind}: ${msg}`, data) }
 })
 
 export default socket
