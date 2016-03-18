@@ -2,7 +2,11 @@ defmodule Rumbl.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", Rumbl.RoomChannel
+  # Transports route events into this UserSocket where they are dispatched into
+  # your channels based on topic patterns declared here using the channel macro.
+  # The videos:* convention will categorize topics with a resource name,
+  # followed by a resource ID. So, almost like a route?
+  channel "videos:*", Rumbl.VideoChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
