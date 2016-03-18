@@ -52,8 +52,23 @@ let Video = {
     vidChannel.on("ping", ({count}) => console.log("PING", count))
   },
 
+  // Something in here protects against cross-site scripting attacks? This
+  // escapes user input. Will only return the string inside. I think I get it.
+  esc(str){
+    let div = document.createElement("div")
+    div.appendChild(document.createTextNode(str))
+    return div.innerHTML
+  },
+
   renderAnnotation(msgContainer, {user, body, at}){
-    // TODO append annotation to msgContainer
+    let template = document.createElement("div")
+    template.innerHTML = `
+    <a href="#" data-seek="${this.esc(at)}">
+      <b>${this.esc(user.username)}</b>: ${this.esc(body)}
+    </a>
+    `
+    msgContainer.appendChild(template)
+    msgContainer.scrollTop = msgContainer.scrollHeight
   }
 }
 export default Video

@@ -1,20 +1,21 @@
 defmodule Rumbl.VideoChannel do
   use Rumbl.Web, :channel
 
-  # This callback enables clients to join topics on a channel. It will return
-  # {:ok, socket} to authorize a join attempt or {:error, socket} to deny.
-  # Each socket will hold its own state for the life of the conversation in the
-  # socket.assigns field, which typically holds a map.
   def join("videos:" <> video_id, _params, socket) do
-    {:ok, assign(socket, :video_id, String.to_integer(video_id))}
-    :timer.send_interval(5_000, :ping)
+    _ = video_id
     {:ok, socket}
   end
 
-  def handle_info(:ping, socket) do
-    count = socket.assigns[:count] || 1
-    push socket, "ping", %{count: count}
+  def handle_in("new_annotation", params, socket) do
 
-    {:noreply, assign(socket, :count, count + 1)}
+    # Broadcast sends an event to all users on the current topic. It takes 3
+    # arguments: socket, name of the event, and a payload [an arbitrary map].
+    broadcast! socket, "new_annotation", %{
+      user: %{username: "anon"},
+      body: params["body"],
+      at:   params["at"]
+    }
+
+    {:reply, :ok, socket}
   end
 end
