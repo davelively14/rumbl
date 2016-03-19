@@ -41,14 +41,25 @@ let Video = {
       msgInput.value = ""
     })
 
+    msgContainer.addEventListener("click", e => {
+      e.preventDefault()
+      let seconds = e.target.getAttribute("data-seek") ||
+                    e.target.parentNode.getAttribute("data-seek")
+      if(!seconds){ return }
+
+      Player.seekTo(seconds)
+    })
+
     // Handles new events sent by the server and renders in the msg-container
     vidChannel.on("new_annotation", (resp) => {
       this.renderAnnotation(msgContainer, resp)
     })
 
+    // On join, receives all the annotations, sends them to scheduleMessages to
+    // be displayed
     vidChannel.join()
-      .receive("ok", ({annotations}) => {
-        annotations.forEach( ann => this.renderAnnotation(msgContainer, ann) )
+      .receive("ok", resp => {
+        this.scheduleMessages(msgContainer, resp.annotations)
       })
       .receive("error", reason => console.log("join failed", reason))
     vidChannel.on("ping", ({count}) => console.log("PING", count))
@@ -66,11 +77,45 @@ let Video = {
     let template = document.createElement("div")
     template.innerHTML = `
     <a href="#" data-seek="${this.esc(at)}">
+      [${this.formatTime(at)}]
       <b>${this.esc(user.username)}</b>: ${this.esc(body)}
     </a>
     `
     msgContainer.appendChild(template)
     msgContainer.scrollTop = msgContainer.scrollHeight
+  },
+
+  // Starts an interval timer that will fire every second. Each time our timer
+  // ticks, we call renderAtTime
+  scheduleMessages(msgContainer, annotations){
+    setTimeout(() => {
+      let ctime = Player.getCurrentTime()
+      let remaining = this.renderAtTime(annotations, ctime, msgContainer)
+      this.scheduleMessages(msgContainer, remaining)
+    }, 1000)
+  },
+
+  // Finds all annotations occuring at or before the current player time.
+  renderAtTime(annotations, seconds, msgContainer){
+
+    // Will render any annotations that were made at this point in the video
+    // or earlier. Will return true on all remaining annotations so that our
+    // scheduluer can keep tabs. Will return false on each annotaiton that is
+    // rendered, which will exclude it from remaining sets.
+    return annotations.filter( ann => {
+      if(ann.at > seconds){
+        return true
+      } else {
+        this.renderAnnotation(msgContainer, ann)
+        return false
+      }
+    })
+  },
+
+  formatTime(at){
+    let date = new Date(null)
+    date.setSeconds(at / 1000)
+    return date.toISOString().substr(14, 5)
   }
 }
 export default Video
