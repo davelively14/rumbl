@@ -1,8 +1,29 @@
 defmodule Rumbl.VideoChannel do
   use Rumbl.Web, :channel
+  alias Rumbl.AnnotationView
 
   def join("videos:" <> video_id, _params, socket) do
-    {:ok, assign(socket, :video_id, String.to_integer(video_id))}
+    video_id = String.to_integer(video_id)
+
+    # Fetches the video from the repo
+    video = Repo.get!(Rumbl.Video, video_id)
+
+    # Fetches all annotations for the video, using the index. Preloads user
+    # associations.
+    annotations = Repo.all(
+      from a in assoc(video, :annotations),
+        order_by: [desc: a.at],
+        limit: 200,
+        preload: [:user]
+    )
+
+    # Composed a response by rendering an annotation.json view for every
+    # annotation in our list using Phoenix.View.render_many. That function
+    # essentially offloads the work to the work to the view layer.
+    resp = %{annotations: Phoenix.View.render_many(annotations, AnnotationView,
+                                                   "annotation.json")}
+
+    {:ok, resp, assign(socket, :video_id, video_id)}
   end
 
   # Ensures every incoming event has the current_user, then calls our
