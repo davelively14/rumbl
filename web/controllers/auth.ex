@@ -21,15 +21,13 @@ defmodule Rumbl.Auth do
 
     # First condition to evaluate true is the only one that runs
     cond do
-      # If we already have a current_user, we return the connection as is
       user = conn.assigns[:current_user] ->
-        conn
+        put_current_user(conn, user)
 
       # If user_id is false, it won't go execute repo.get. Same as:
       #   if user_id, do: repo.get(Rumbl.User, user_id)
       user = user_id && repo.get(Rumbl.User, user_id) ->
-        # Stores the user in the :current_user
-        assign(conn, :current_user, user)
+        put_current_user(conn, user)
 
       # If no user is logged in, will assign nil
       true ->
@@ -40,6 +38,7 @@ defmodule Rumbl.Auth do
 
   def login(conn, user) do
     conn
+    |> put_current_user(user)
     |> assign(:current_user, user)
     |> put_session(:user_id, user.id)
 
@@ -47,6 +46,15 @@ defmodule Rumbl.Auth do
     # cookie back to the client with a different identifier, in case an attacker knew
     # the previous one.
     |> configure_session(renew: true)
+  end
+
+  # Both assigns the user and the token to the connection for use in authorization
+  defp put_current_user(conn, user) do
+    token = Phoenix.Token.sign(conn, "user socket", user.id)
+
+    conn
+    |> assign(:current_user, user)
+    |> assign(:user_token, token)
   end
 
   def login_by_username_and_pass(conn, username, given_pass, opts) do
