@@ -52,6 +52,10 @@ let Video = {
 
     // Handles new events sent by the server and renders in the msg-container
     vidChannel.on("new_annotation", (resp) => {
+
+      // Stores the last_seen_id in the channel's params object. Everytime we
+      // this client sees a new annotation it will update
+      vidChannel.params.last_seen_id = resp.id
       this.renderAnnotation(msgContainer, resp)
     })
 
@@ -59,6 +63,11 @@ let Video = {
     // be displayed
     vidChannel.join()
       .receive("ok", resp => {
+
+        // Takes the max annotation ID and stores it as the last_seen_id
+        let ids = resp.annotations.map(ann => ann.id)
+        vidChannel.params.last_seen_id = Math.max(...ids)
+
         this.scheduleMessages(msgContainer, resp.annotations)
       })
       .receive("error", reason => console.log("join failed", reason))
