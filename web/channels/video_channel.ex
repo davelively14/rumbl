@@ -13,7 +13,7 @@ defmodule Rumbl.VideoChannel do
     video = Repo.get!(Rumbl.Video, video_id)
 
     # Fetches all annotations for the video, using the index. Preloads user
-    # associations.
+    # associations. Only selects annotations created after the last_seen_id
     annotations = Repo.all(
       from a in assoc(video, :annotations),
         where: a.id > ^last_seen_id,
