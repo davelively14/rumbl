@@ -7,8 +7,6 @@ defmodule Rumbl.Counter do
 
   def val(pid), do: GenServer.call(pid, :val)
 
-  # These two functions are the server
-
   def start_link(initial_val) do
     GenServer.start_link(__MODULE__, initial_val)
   end
@@ -25,7 +23,7 @@ defmodule Rumbl.Counter do
     {:noreply, val - 1}
   end
 
-  def handle_cast(:val, _from, val) do
+  def handle_call(:val, _from, val) do
     {:reply, val, val}
   end
 end
