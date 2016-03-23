@@ -13,11 +13,15 @@ defmodule Rumbl do
       supervisor(Rumbl.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(Rumbl.Worker, [arg1, arg2, arg3]),
-      worker(Rumbl.Counter, [5]),
+      worker(Rumbl.Counter, [5], restart: :temporary),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
+
+    # :one_for_one strategy means that if a child dies, only that child will be
+    # restarted. If we used :one_for_all, for instance, it would restart
+    # all of the child processes upon one child's death.
     opts = [strategy: :one_for_one, name: Rumbl.Supervisor]
     Supervisor.start_link(children, opts)
   end
